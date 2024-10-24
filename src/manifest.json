@@ -1,0 +1,22 @@
+{
+    "name": "Ежедневник",
+    "short_name": "Day",
+    "description": "Привет я Арсен Это мой Ежедневник",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4CAF50",
+    "icons": [
+      {
+        "src": "src/assets/mobile-phone.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "src/assets/mobile-phone.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ]
+  }
+  

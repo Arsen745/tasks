@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import './Home.css'
 import services from '../services/services';
-import { Table, Select, Switch, Button, Drawer, Form, Input, DatePicker } from 'antd';
+import { Table, Select, Switch, Button, Drawer, Form, Input, DatePicker, Row, Col } from 'antd';
 import { format } from 'date-fns';
-
 
 const { Column } = Table;
 
 const Home = () => {
     const [selectS, setSelect] = useState(null);
     const [data, setData] = useState([]);
-    const [postTasks, setPostTasks] = useState('')
-    const [postCompleted, setPostCompleted] = useState(false)
-    const [postDate, setPostDate] = useState('')
-
+    const [postTasks, setPostTasks] = useState('');
+    const [postCompleted, setPostCompleted] = useState(false);
+    const [postDate, setPostDate] = useState('');
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         const getTask = async () => {
@@ -21,7 +21,6 @@ const Home = () => {
         };
         getTask();
     }, []);
-
 
     useEffect(() => {
         const getCompleted = async () => {
@@ -33,7 +32,6 @@ const Home = () => {
         getCompleted();
     }, [selectS]);
 
-    // Форматирование даты
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = date.getDate();
@@ -42,17 +40,10 @@ const Home = () => {
         return `${day < 10 ? '0' + day : day}-${month < 10 ? '0' + month : month}-${year}`;
     };
 
-    // Обработчик изменения переключателя для обновления статуса
     const onChange2 = async (checked, id) => {
         try {
-            // Отправляем PUT запрос с обновлением только поля completed
-            const updatedTask = {
-                completed: checked
-            };
-
+            const updatedTask = { completed: checked };
             await services.upDateTask(id, updatedTask);
-
-            // Обновляем локальное состояние данных
             setData(prevData =>
                 prevData.map(task =>
                     task.id === id ? { ...task, completed: checked } : task
@@ -70,44 +61,44 @@ const Home = () => {
     const onSearch = (value) => {
         console.log('Search:', value);
     };
-    const [open, setOpen] = useState(false);
+
     const showDrawer = () => {
         setOpen(true);
     };
+
     const onClose = () => {
         setOpen(false);
     };
 
-
     const PostDataFun = () => {
-        console.log(postTasks);
-        console.log(postDate);
-        console.log(postCompleted);
         const postReqTask = async () => {
-            const response = await services.postTasks(postTasks, postDate, postCompleted)
+            const response = await services.postTasks(postTasks, postDate, postCompleted);
             console.log(response);
-
-        }
-        postReqTask()
-
-    }
-
+        };
+        postReqTask();
+    };
 
     return (
         <div className='container'>
-            <Select
-                style={{ marginRight: 10, marginBottom: 50 }}
-                showSearch
-                placeholder="Выберите статус"
-                optionFilterProp="label"
-                onChange={onChange}
-                onSearch={onSearch}
-                options={[
-                    { value: 'true', label: 'Выполнено' },
-                    { value: 'false', label: 'Не выполнено' },
-                ]}
-            />
-            <Button type="primary" onClick={showDrawer}>Создать Задания</Button>
+            <Row gutter={16} style={{ marginBottom: 50 }}>
+                <Col xs={24} sm={12} md={8}>
+                    <Select
+                        style={{ width: '100%' }}
+                        showSearch
+                        placeholder="Выберите статус"
+                        optionFilterProp="label"
+                        onChange={onChange}
+                        onSearch={onSearch}
+                        options={[
+                            { value: 'true', label: 'Выполнено' },
+                            { value: 'false', label: 'Не выполнено' },
+                        ]}
+                    />
+                </Col>
+                <Col xs={24} sm={12} md={8}>
+                    <Button type="primary" onClick={showDrawer}>Создать Задания</Button>
+                </Col>
+            </Row>
             <Table dataSource={data} rowKey="id">
                 <Column title="Номер" dataIndex="id" key="id" />
                 <Column title="Название" dataIndex="title" key="title" />
@@ -116,7 +107,7 @@ const Home = () => {
                     <span>{text ? 'Выполнено' : 'Не выполнено'}</span>
                 )} />
                 <Column
-                    title="Статус выполнения"
+                    title="Статус выполненияAh"
                     dataIndex="completed"
                     key="completedSwitch"
                     render={(text, record) => (
@@ -133,7 +124,7 @@ const Home = () => {
                     render={(text) => formatDate(text)}
                 />
             </Table>
-            <Drawer title="Basic Drawer" onClose={onClose} open={open}>
+            <Drawer title="Создание задания" onClose={onClose} open={open}>
                 <Form
                     name="wrap"
                     labelCol={{
@@ -150,47 +141,30 @@ const Home = () => {
                     }}
                 >
                     <Form.Item
-                        onChange={(e) => setPostTasks(e.target.value)}
                         label="Названия Задача"
-                        name="username"
-                        rules={[
-                            {
-                                required: true,
-                            },
-                        ]}
+                        name="task"
+                        rules={[{ required: true }]}
                     >
-                        <Input />
+                        <Input onChange={(e) => setPostTasks(e.target.value)} />
                     </Form.Item>
 
                     <Form.Item
-
-                        label="A super long label text"
-                        name="password"
-                        rules={[
-                            {
-                                required: true,
-                            },
-                        ]}
+                        label="Дата выполнения"
+                        name="date"
+                        rules={[{ required: true }]}
                     >
                         <DatePicker onChange={(date) => {
-                            const formattedDate = date ? date.toISOString().split('T')[0] : null; // Форматирование в YYYY-MM-DD
-                            setPostDate(formattedDate)
+                            const formattedDate = date ? date.toISOString().split('T')[0] : null;
+                            setPostDate(formattedDate);
                         }} />
                     </Form.Item>
-                    <Form.Item
-                        label="A super long label text"
-                        name="completed"
-                        rules={[
-                            {
-                                required: true,
-                            },
-                        ]}
-                    >
-                        <Switch />
+                    
+                    <Form.Item label="Статус выполнения">
+                        <Switch checked={postCompleted} onChange={(checked) => setPostCompleted(checked)} />
                     </Form.Item>
 
-                    <Form.Item label=" ">
-                        <Button type="primary" htmlType="submit" onClick={() => { PostDataFun() }}>
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit" onClick={PostDataFun}>
                             Создать
                         </Button>
                     </Form.Item>
